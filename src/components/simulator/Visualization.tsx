@@ -218,24 +218,28 @@ const Visualization = ({
                     const isPointerLeft = pointers.left === index;
                     const isPointerRight = pointers.right === index;
                     const isHighlighted = highlightedIndices.includes(index);
+                    const isTarget = simulationState === "complete" && isMid;
 
                     return (
                       <div className="relative" key={`element-${index}`}>
                         <motion.div
                           initial={{ scale: 0.8, opacity: 0 }}
                           animate={{
-                            scale: isHighlighted ? 1.1 : 1,
+                            scale: isHighlighted || isTarget ? 1.1 : 1,
                             opacity: 1,
-                            backgroundColor: isMid
-                              ? "rgb(254, 240, 138)"
-                              : "white",
+                            backgroundColor: isTarget
+                              ? "rgb(187, 247, 208)" // green for found target
+                              : isMid
+                                ? "rgb(254, 240, 138)"
+                                : isPointerLeft || isPointerRight
+                                  ? "rgb(224, 242, 254)"
+                                  : "white",
                           }}
                           transition={{ duration: 0.3 }}
                           className={`
                             flex items-center justify-center
                             w-12 h-12 m-1 rounded-md border-2
-                            ${isMid ? "border-yellow-400 bg-yellow-50" : "border-gray-300"}
-                            ${isPointerLeft || isPointerRight ? "bg-sky-100" : ""}
+                            ${isTarget ? "border-green-500 bg-green-50" : isMid ? "border-yellow-400 bg-yellow-50" : isPointerLeft || isPointerRight ? "border-blue-400 bg-blue-50" : "border-gray-300"}
                             shadow-sm font-medium text-lg
                           `}
                         >
@@ -266,7 +270,7 @@ const Visualization = ({
                             animate={{ y: 0, opacity: 1 }}
                             className="absolute -bottom-7 left-1/2 transform -translate-x-1/2 text-xs font-bold text-yellow-600"
                           >
-                            Mid
+                            Mid{isTarget ? " (Target Found)" : ""}
                           </motion.div>
                         )}
 
@@ -282,7 +286,7 @@ const Visualization = ({
                   <h3 className="font-medium text-gray-700 mb-2">
                     Binary Search State
                   </h3>
-                  <div className="grid grid-cols-3 gap-4">
+                  <div className="grid grid-cols-3 gap-4 mb-4">
                     <div className="bg-white p-2 rounded border">
                       <span className="text-blue-600 font-bold">Left:</span>{" "}
                       {pointers.left}
@@ -295,6 +299,22 @@ const Visualization = ({
                       <span className="text-green-600 font-bold">Right:</span>{" "}
                       {pointers.right}
                     </div>
+                  </div>
+
+                  <div className="bg-white p-3 rounded border text-left">
+                    <span className="text-gray-600 font-bold">
+                      Current Operation:
+                    </span>{" "}
+                    {simulationState === "init" && "Initializing variables"}
+                    {simulationState === "first-window" &&
+                      "Calculating mid point"}
+                    {simulationState === "sliding" && "Narrowing search range"}
+                    {simulationState === "complete" && (
+                      <span className="text-green-600 font-medium">
+                        Target found at index{" "}
+                        {Math.floor((pointers.left + pointers.right) / 2)}!
+                      </span>
+                    )}
                   </div>
                 </div>
               </div>

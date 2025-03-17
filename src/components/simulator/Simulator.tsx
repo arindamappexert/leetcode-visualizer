@@ -94,6 +94,21 @@ const Simulator = ({
       setMaxSum(0);
       setHighlightedIndices([]);
       setHighlightedCodeLines([0]); // Start with function declaration
+    } else if (patternId === "binary-search") {
+      // For binary search, we need steps for:
+      // 1. Initialization
+      // 2. Each iteration of the while loop (log n iterations in worst case)
+      // 3. Final result
+      const maxIterations =
+        Math.ceil(Math.log2(currentExample.data.length)) + 1;
+      const totalSimulationSteps = 1 + maxIterations + 1; // init + iterations + result
+      setTotalSteps(totalSimulationSteps);
+
+      // Reset simulation state
+      setSimulationState("init");
+      setPointers({ left: 0, right: currentExample.data.length - 1 });
+      setHighlightedIndices([]);
+      setHighlightedCodeLines([0]); // Start with function declaration
     }
   }, [patternId, currentExample, selectedExample]);
 
@@ -116,6 +131,8 @@ const Simulator = ({
         // Update simulation state based on the algorithm
         if (patternId === "sliding-window") {
           updateSlidingWindowSimulation(currentStep);
+        } else if (patternId === "binary-search") {
+          updateBinarySearchSimulation(currentStep);
         }
       }, 1000 / playbackSpeed);
     }
@@ -131,7 +148,7 @@ const Simulator = ({
     pointers,
   ]);
 
-  // Function to update the sliding window simulation state
+  // Function to update the simulation state based on algorithm
   const updateSlidingWindowSimulation = (step: number) => {
     const data = currentExample.data;
     const k = 3; // Default window size
@@ -178,6 +195,49 @@ const Simulator = ({
     }
   };
 
+  // Function to update the binary search simulation state
+  const updateBinarySearchSimulation = (step: number) => {
+    const data = currentExample.data;
+    const target = 5; // Default target value for visualization
+
+    if (step === 0) {
+      // Initialization step
+      setSimulationState("init");
+      setPointers({ left: 0, right: data.length - 1 });
+      setHighlightedIndices([]);
+      setHighlightedCodeLines([1, 2]); // Variable initialization
+    } else if (step > 0 && step < totalSteps - 1) {
+      // Binary search iterations
+      setSimulationState("sliding"); // Reusing the sliding state for narrowing search range
+
+      const mid = Math.floor((pointers.left + pointers.right) / 2);
+      setHighlightedIndices([mid]);
+
+      // Simulate the binary search logic
+      if (data[mid] === target) {
+        // Target found
+        setHighlightedCodeLines([6, 7, 8]); // Target found condition
+        if (step === totalSteps - 2) {
+          setSimulationState("complete");
+        }
+      } else if (data[mid] < target) {
+        // Search right half
+        setHighlightedCodeLines([10, 11]);
+        setPointers({ left: mid + 1, right: pointers.right });
+      } else {
+        // Search left half
+        setHighlightedCodeLines([12, 13]);
+        setPointers({ left: pointers.left, right: mid - 1 });
+      }
+    } else {
+      // Final result
+      setSimulationState("complete");
+      const mid = Math.floor((pointers.left + pointers.right) / 2);
+      setHighlightedIndices([mid]);
+      setHighlightedCodeLines([8]); // Return statement for found target
+    }
+  };
+
   const handlePlay = () => {
     if (currentStep >= totalSteps) {
       // Reset if we're at the end
@@ -201,6 +261,8 @@ const Simulator = ({
       // Update simulation state based on the algorithm
       if (patternId === "sliding-window") {
         updateSlidingWindowSimulation(nextStep);
+      } else if (patternId === "binary-search") {
+        updateBinarySearchSimulation(nextStep);
       }
 
       if (nextStep >= totalSteps) {
@@ -217,6 +279,8 @@ const Simulator = ({
       // Update simulation state based on the algorithm
       if (patternId === "sliding-window") {
         updateSlidingWindowSimulation(prevStep);
+      } else if (patternId === "binary-search") {
+        updateBinarySearchSimulation(prevStep);
       }
 
       setSimulationComplete(false);
@@ -234,6 +298,11 @@ const Simulator = ({
       setPointers({ left: 0, right: 2 });
       setWindowSum(0);
       setMaxSum(0);
+      setHighlightedIndices([]);
+      setHighlightedCodeLines([0]); // Start with function declaration
+    } else if (patternId === "binary-search") {
+      setSimulationState("init");
+      setPointers({ left: 0, right: currentExample.data.length - 1 });
       setHighlightedIndices([]);
       setHighlightedCodeLines([0]); // Start with function declaration
     }

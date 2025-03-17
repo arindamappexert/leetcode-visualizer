@@ -134,8 +134,28 @@ const PatternExplanation = ({
                 </div>
               )}
 
+              {title.toLowerCase().includes("binary search") && (
+                <div className="flex flex-col items-center">
+                  <div className="flex items-center space-x-1 mb-4">
+                    {[1, 2, 3, 4, 5, 6, 7, 8, 9].map((value, index) => (
+                      <div
+                        key={index}
+                        className={`w-8 h-8 flex items-center justify-center rounded-md border-2 ${index === 4 ? "border-yellow-500 bg-yellow-100" : index === 0 || index === 8 ? "border-blue-500 bg-blue-100" : "border-gray-300"}`}
+                      >
+                        {value}
+                      </div>
+                    ))}
+                  </div>
+                  <div className="text-sm text-gray-700 dark:text-gray-300">
+                    Binary search divides array in half to find target
+                    efficiently
+                  </div>
+                </div>
+              )}
+
               {!title.toLowerCase().includes("sliding window") &&
-                !title.toLowerCase().includes("two pointers") && (
+                !title.toLowerCase().includes("two pointers") &&
+                !title.toLowerCase().includes("binary search") && (
                   <p className="text-gray-500 dark:text-gray-400">
                     Pattern visualization will appear here
                   </p>
