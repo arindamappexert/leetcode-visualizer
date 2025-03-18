@@ -7,7 +7,6 @@ import Simulator from "@/components/simulator/Simulator";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
 import { ArrowLeft } from "lucide-react";
-import Navbar from "@/components/layout/Navbar";
 
 // Mock data for patterns
 const patternData = {
@@ -42,6 +41,19 @@ const patternData = {
         difficulty: "Easy",
         description: "Find the contiguous subarray with the largest sum.",
         url: "https://leetcode.com/problems/maximum-subarray/",
+        solutionCode: `function maxSubArray(nums) {
+  let maxSum = nums[0];
+  let currentSum = nums[0];
+  
+  for (let i = 1; i < nums.length; i++) {
+    // Either start a new subarray or continue the previous one
+    currentSum = Math.max(nums[i], currentSum + nums[i]);
+    // Update maximum sum if current sum is greater
+    maxSum = Math.max(maxSum, currentSum);
+  }
+  
+  return maxSum;
+}`,
       },
       {
         id: "2",
@@ -50,6 +62,28 @@ const patternData = {
         description:
           "Find the length of the longest substring without repeating characters.",
         url: "https://leetcode.com/problems/longest-substring-without-repeating-characters/",
+        solutionCode: `function lengthOfLongestSubstring(s) {
+  let maxLength = 0;
+  let start = 0;
+  const charMap = new Map();
+  
+  for (let end = 0; end < s.length; end++) {
+    const currentChar = s[end];
+    
+    // If character is already in the current window, move the start pointer
+    if (charMap.has(currentChar) && charMap.get(currentChar) >= start) {
+      start = charMap.get(currentChar) + 1;
+    }
+    
+    // Update the character position
+    charMap.set(currentChar, end);
+    
+    // Update max length
+    maxLength = Math.max(maxLength, end - start + 1);
+  }
+  
+  return maxLength;
+}`,
       },
       {
         id: "3",
@@ -58,6 +92,24 @@ const patternData = {
         description:
           "Find the minimum length subarray with a sum greater than or equal to a target value.",
         url: "https://leetcode.com/problems/minimum-size-subarray-sum/",
+        solutionCode: `function minSubArrayLen(target, nums) {
+  let minLength = Infinity;
+  let start = 0;
+  let sum = 0;
+  
+  for (let end = 0; end < nums.length; end++) {
+    sum += nums[end];
+    
+    // Shrink the window as small as possible while maintaining the sum >= target
+    while (sum >= target) {
+      minLength = Math.min(minLength, end - start + 1);
+      sum -= nums[start];
+      start++;
+    }
+  }
+  
+  return minLength === Infinity ? 0 : minLength;
+}`,
       },
     ],
     examples: [
@@ -129,6 +181,27 @@ const patternData = {
         description:
           "Given a sorted array, find two numbers that add up to a specific target.",
         url: "https://leetcode.com/problems/two-sum-ii-input-array-is-sorted/",
+        solutionCode: `function twoSum(numbers, target) {
+  let left = 0;
+  let right = numbers.length - 1;
+  
+  while (left < right) {
+    const currentSum = numbers[left] + numbers[right];
+    
+    if (currentSum === target) {
+      // LeetCode expects 1-indexed result
+      return [left + 1, right + 1];
+    }
+    
+    if (currentSum < target) {
+      left++;
+    } else {
+      right--;
+    }
+  }
+  
+  return [-1, -1]; // No solution found
+}`,
       },
       {
         id: "2",
@@ -137,6 +210,42 @@ const patternData = {
         description:
           "Find all unique triplets in the array which gives the sum of zero.",
         url: "https://leetcode.com/problems/3sum/",
+        solutionCode: `function threeSum(nums) {
+  const result = [];
+  
+  // Sort the array to handle duplicates and use two pointers approach
+  nums.sort((a, b) => a - b);
+  
+  for (let i = 0; i < nums.length - 2; i++) {
+    // Skip duplicates for the first element
+    if (i > 0 && nums[i] === nums[i - 1]) continue;
+    
+    let left = i + 1;
+    let right = nums.length - 1;
+    
+    while (left < right) {
+      const sum = nums[i] + nums[left] + nums[right];
+      
+      if (sum === 0) {
+        // Found a triplet
+        result.push([nums[i], nums[left], nums[right]]);
+        
+        // Skip duplicates
+        while (left < right && nums[left] === nums[left + 1]) left++;
+        while (left < right && nums[right] === nums[right - 1]) right--;
+        
+        left++;
+        right--;
+      } else if (sum < 0) {
+        left++;
+      } else {
+        right--;
+      }
+    }
+  }
+  
+  return result;
+}`,
       },
       {
         id: "3",
@@ -145,6 +254,30 @@ const patternData = {
         description:
           "Find two lines that together with the x-axis form a container that holds the most water.",
         url: "https://leetcode.com/problems/container-with-most-water/",
+        solutionCode: `function maxArea(height) {
+  let maxWater = 0;
+  let left = 0;
+  let right = height.length - 1;
+  
+  while (left < right) {
+    // Calculate the area
+    const width = right - left;
+    const minHeight = Math.min(height[left], height[right]);
+    const area = width * minHeight;
+    
+    // Update max area
+    maxWater = Math.max(maxWater, area);
+    
+    // Move the pointer with the smaller height
+    if (height[left] < height[right]) {
+      left++;
+    } else {
+      right--;
+    }
+  }
+  
+  return maxWater;
+}`,
       },
     ],
     examples: [
@@ -214,6 +347,26 @@ const patternData = {
         difficulty: "Easy",
         description: "Find a target value in a sorted array.",
         url: "https://leetcode.com/problems/binary-search/",
+        solutionCode: `function search(nums, target) {
+  let left = 0;
+  let right = nums.length - 1;
+  
+  while (left <= right) {
+    const mid = Math.floor((left + right) / 2);
+    
+    if (nums[mid] === target) {
+      return mid; // Target found
+    }
+    
+    if (nums[mid] < target) {
+      left = mid + 1; // Search in the right half
+    } else {
+      right = mid - 1; // Search in the left half
+    }
+  }
+  
+  return -1; // Target not found
+}`,
       },
       {
         id: "2",
@@ -221,6 +374,39 @@ const patternData = {
         difficulty: "Medium",
         description: "Search for a target in a rotated sorted array.",
         url: "https://leetcode.com/problems/search-in-rotated-sorted-array/",
+        solutionCode: `function search(nums, target) {
+  let left = 0;
+  let right = nums.length - 1;
+  
+  while (left <= right) {
+    const mid = Math.floor((left + right) / 2);
+    
+    if (nums[mid] === target) {
+      return mid; // Target found
+    }
+    
+    // Check if the left half is sorted
+    if (nums[left] <= nums[mid]) {
+      // Check if target is in the left sorted half
+      if (nums[left] <= target && target < nums[mid]) {
+        right = mid - 1; // Search left half
+      } else {
+        left = mid + 1; // Search right half
+      }
+    } 
+    // Right half is sorted
+    else {
+      // Check if target is in the right sorted half
+      if (nums[mid] < target && target <= nums[right]) {
+        left = mid + 1; // Search right half
+      } else {
+        right = mid - 1; // Search left half
+      }
+    }
+  }
+  
+  return -1; // Target not found
+}`,
       },
       {
         id: "3",
@@ -229,6 +415,60 @@ const patternData = {
         description:
           "Find the starting and ending position of a given target value.",
         url: "https://leetcode.com/problems/find-first-and-last-position-of-element-in-sorted-array/",
+        solutionCode: `function searchRange(nums, target) {
+  const findLeftmost = (nums, target) => {
+    let left = 0;
+    let right = nums.length - 1;
+    let leftmost = -1;
+    
+    while (left <= right) {
+      const mid = Math.floor((left + right) / 2);
+      
+      if (nums[mid] === target) {
+        leftmost = mid; // Potential leftmost position
+        right = mid - 1; // Continue searching in the left half
+      } else if (nums[mid] < target) {
+        left = mid + 1;
+      } else {
+        right = mid - 1;
+      }
+    }
+    
+    return leftmost;
+  };
+  
+  const findRightmost = (nums, target) => {
+    let left = 0;
+    let right = nums.length - 1;
+    let rightmost = -1;
+    
+    while (left <= right) {
+      const mid = Math.floor((left + right) / 2);
+      
+      if (nums[mid] === target) {
+        rightmost = mid; // Potential rightmost position
+        left = mid + 1; // Continue searching in the right half
+      } else if (nums[mid] < target) {
+        left = mid + 1;
+      } else {
+        right = mid - 1;
+      }
+    }
+    
+    return rightmost;
+  };
+  
+  const leftPosition = findLeftmost(nums, target);
+  
+  // If target not found, return [-1, -1]
+  if (leftPosition === -1) {
+    return [-1, -1];
+  }
+  
+  const rightPosition = findRightmost(nums, target);
+  
+  return [leftPosition, rightPosition];
+}`,
       },
     ],
     examples: [
@@ -476,12 +716,12 @@ const PatternDetailPage = () => {
   if (showSimulator) {
     return (
       <div className="min-h-screen bg-background">
-        <Navbar onToggleTheme={toggleTheme} isDarkMode={isDarkMode} />
         <Simulator
           patternId={id}
           patternName={pattern.name}
           initialCode={pattern.initialCode}
           examples={pattern.examples}
+          problems={pattern.problems}
           onBack={handleBackToPattern}
         />
       </div>
@@ -490,7 +730,6 @@ const PatternDetailPage = () => {
 
   return (
     <div className="min-h-screen bg-background">
-      <Navbar onToggleTheme={toggleTheme} isDarkMode={isDarkMode} />
       <div className="container mx-auto py-8 px-4">
         <div className="mb-6">
           <Button
@@ -513,6 +752,7 @@ const PatternDetailPage = () => {
         <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
           <TabsList className="mb-6">
             <TabsTrigger value="explanation">Explanation</TabsTrigger>
+            <TabsTrigger value="code-template">Code Template</TabsTrigger>
             <TabsTrigger value="examples">Example Problems</TabsTrigger>
           </TabsList>
 
@@ -534,6 +774,53 @@ const PatternDetailPage = () => {
               >
                 Start Interactive Simulation
               </Button>
+            </div>
+          </TabsContent>
+
+          <TabsContent value="code-template" className="space-y-6">
+            <div className="bg-card rounded-lg p-6 shadow-sm">
+              <h2 className="text-xl font-bold mb-4">
+                {pattern.name} Pattern Template
+              </h2>
+              <p className="text-muted-foreground mb-4">
+                This template demonstrates the core structure of the{" "}
+                {pattern.name} pattern. You can use this as a starting point for
+                solving problems that utilize this algorithmic approach.
+              </p>
+
+              <div className="bg-muted p-4 rounded-md overflow-auto">
+                <pre className="text-sm">
+                  <code>{pattern.initialCode}</code>
+                </pre>
+              </div>
+
+              <div className="mt-6">
+                <h3 className="text-lg font-semibold mb-2">
+                  How to use this template
+                </h3>
+                <ul className="list-disc pl-5 space-y-1 text-muted-foreground">
+                  <li>
+                    Understand the core logic of the {pattern.name} pattern
+                  </li>
+                  <li>
+                    Adapt the parameters and conditions to your specific problem
+                  </li>
+                  <li>
+                    Modify the data structures as needed for your use case
+                  </li>
+                  <li>Test with different inputs to ensure correctness</li>
+                </ul>
+              </div>
+
+              <div className="flex justify-center mt-8">
+                <Button
+                  size="lg"
+                  className="px-8"
+                  onClick={() => handleStartSimulation()}
+                >
+                  Try in Interactive Simulator
+                </Button>
+              </div>
             </div>
           </TabsContent>
 

@@ -23,6 +23,7 @@ interface VisualizationProps {
   windowSum?: number;
   maxSum?: number;
   simulationState?: "init" | "first-window" | "sliding" | "complete";
+  targetValue?: number;
 }
 
 const Visualization = ({
@@ -38,6 +39,7 @@ const Visualization = ({
   windowSum = 0,
   maxSum = 0,
   simulationState = "init",
+  targetValue = 5,
 }: VisualizationProps) => {
   const containerRef = useRef<HTMLDivElement>(null);
 
@@ -219,6 +221,7 @@ const Visualization = ({
                     const isPointerRight = pointers.right === index;
                     const isHighlighted = highlightedIndices.includes(index);
                     const isTarget = simulationState === "complete" && isMid;
+                    const isTargetValue = value === targetValue;
 
                     return (
                       <div className="relative" key={`element-${index}`}>
@@ -231,15 +234,27 @@ const Visualization = ({
                               ? "rgb(187, 247, 208)" // green for found target
                               : isMid
                                 ? "rgb(254, 240, 138)"
-                                : isPointerLeft || isPointerRight
-                                  ? "rgb(224, 242, 254)"
-                                  : "white",
+                                : isTargetValue
+                                  ? "rgb(254, 215, 170)" // light orange for target value
+                                  : isPointerLeft || isPointerRight
+                                    ? "rgb(224, 242, 254)"
+                                    : "white",
                           }}
                           transition={{ duration: 0.3 }}
                           className={`
                             flex items-center justify-center
                             w-12 h-12 m-1 rounded-md border-2
-                            ${isTarget ? "border-green-500 bg-green-50" : isMid ? "border-yellow-400 bg-yellow-50" : isPointerLeft || isPointerRight ? "border-blue-400 bg-blue-50" : "border-gray-300"}
+                            ${
+                              isTarget
+                                ? "border-green-500 bg-green-50"
+                                : isMid
+                                  ? "border-yellow-400 bg-yellow-50"
+                                  : isTargetValue
+                                    ? "border-orange-400 bg-orange-50"
+                                    : isPointerLeft || isPointerRight
+                                      ? "border-blue-400 bg-blue-50"
+                                      : "border-gray-300"
+                            }
                             shadow-sm font-medium text-lg
                           `}
                         >
@@ -299,6 +314,12 @@ const Visualization = ({
                       <span className="text-green-600 font-bold">Right:</span>{" "}
                       {pointers.right}
                     </div>
+                  </div>
+                  <div className="bg-white p-2 rounded border mb-4">
+                    <span className="text-orange-600 font-bold">
+                      Target Value:
+                    </span>{" "}
+                    {targetValue}
                   </div>
 
                   <div className="bg-white p-3 rounded border text-left">
